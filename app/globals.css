@@ -1,26 +1,741 @@
-@import "tailwindcss";
+/* app/globals.css
+   MERGED global styles for BlockTalk UI
+   (Paste this content into app/globals.css, replacing its current contents)
+*/
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+:root{
+  --bg-1: #05050a;
+  --bg-2: #0b0b11;
+  --muted: #9aa3ad;
+  --accent-a: #6ee7d7;
+  --accent-b: #c084fc;
+  --glass: rgba(255,255,255,0.02);
+  --glass-2: rgba(255,255,255,0.03);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* reset */
+*{box-sizing:border-box}
+html,body { height:100%; }
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 60%);
+  color: #e6eef6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x: hidden; /* defensive guard */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* layout container */
+.main-wrap {
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:100px 28px 160px;
+  max-width: 1280px; /* sane page width */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 18px;
+  padding-right: 18px;
+  box-sizing: border-box;
+}
+
+/* ---------- HERO ---------- */
+.hero {
+  width:100%;
+  max-width:1200px;
+  margin:0 auto;
+  text-align:center;
+}
+
+.hero-title {
+  margin-bottom: 0.5rem;
+  margin:0 0 6px;
+  line-height:1.02;
+}
+.hero-title .display {
+  font-weight:800;
+  font-size: clamp(36px, 6.5vw, 72px);
+  letter-spacing: -0.6px;
+  margin:0;
+}
+.hero-title .gradient {
+  background: linear-gradient(90deg, var(--accent-a), var(--accent-b) 70%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display:inline-block;
+}
+
+.hero-sub {
+  margin: 12px auto 40px;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  max-width: 720px;
+}
+
+/* ---------- CHAT CARD ---------- */
+.chat-mock {
+  min-height: 200px;
+  height: auto;
+  padding: 1.5rem;
+  width:100%;
+  max-width: 1000px;         /* card width larger like poster */
+  margin: 0 auto;
+  border-radius: 14px;      /* slightly square */
+  padding: 30px;            /* room inside */
+  background: linear-gradient(180deg, rgba(255,255,255,0.014), rgba(255,255,255,0.008));
+  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 44px 90px rgba(0,0,0,0.62);
+  backdrop-filter: blur(14px) saturate(120%);
+  position:relative;
+  overflow:visible;
+}
+
+/* subtle center divider line inside chat */
+.chat-mock .divider {
+  position:absolute;
+  left:50%;
+  top: 32px;
+  bottom: 96px;
+  width:1px;
+  transform:translateX(-50%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
+  opacity:0.75;
+  pointer-events:none;
+}
+
+/* layout inside chat: avatar column + content */
+.chat-row-wrap { display:flex; gap:18px; align-items:flex-start; }
+
+/* avatar column */
+.avatar-col { width:72px; display:flex; flex-direction:column; align-items:center; gap:14px; padding-top:6px; }
+.avatar-ring {
+  width:52px; height:52px; border-radius:999px;
+  background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+  padding:3px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 8px 26px rgba(0,0,0,0.45);
+}
+.avatar-inner {
+  width:100%; height:100%; border-radius:999px; background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.96));
+}
+
+/* messages & content column */
+.content-col { flex:1; min-width:0; }
+
+/* single message bubble */
+.msg {
+  display:inline-block;
+  padding:12px 14px;
+  border-radius:12px;
+  max-width:72%;
+  font-size:1rem;
+  line-height:1.4;
+  margin-bottom:12px;
+  word-break:break-word;
+}
+.msg.assistant {
+  background: rgba(18,18,20,0.85);
+  color:#e6eef6;
+  border:1px solid rgba(255,255,255,0.02);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.01);
+}
+.msg.user {
+  margin-left:auto;
+  background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+  color:#041414;
+  border-radius:14px;
+  padding:10px 16px;
+  font-weight:600;
+}
+
+/* suggestion pills */
+.suggestions { display:flex; gap:12px; margin:18px 0 14px; flex-wrap:wrap; align-items:center; }
+.suggestion {
+  padding:8px 12px; border-radius:999px; background: rgba(255,255,255,0.02);
+  color:var(--muted); font-size:0.9rem; border:1px solid rgba(255,255,255,0.02); cursor:pointer;
+}
+.suggestion:hover { background: linear-gradient(90deg, rgba(110,231,215,0.06), rgba(192,132,252,0.06)); color: #e6eef6; transform: translateY(-2px); }
+
+/* input row (raycast style) */
+.input-row { display:flex; gap:12px; align-items:center; margin-top:8px; }
+.command-bar {
+  flex:1; display:flex; align-items:center; gap:12px;
+  background: rgba(18,18,22,0.85);
+  border-radius:999px;
+  padding:12px 16px;
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+}
+.command-bar input {
+  flex:1; background:transparent; border:0; outline:none; color:#dfeff6; font-size:1rem;
+}
+.send-inline {
+  height:44px; padding:10px 14px; border-radius:999px;
+  background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+  border:0; color:#041414; font-weight:700; cursor:pointer; box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+}
+
+/* subtle smaller footer circular icon (bottom-left) */
+.corner-dot {
+  position:fixed; left:18px; bottom:18px; width:44px; height:44px; border-radius:999px; display:flex; align-items:center; justify-content:center;
+  background: rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.03); box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+
+/* ---------- DASHBOARD ---------- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 18px;
+  align-items: start;
+  margin-top: 8px;
+}
+
+/* small reusable card style for dashboard */
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.014), rgba(255,255,255,0.008));
+  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* mobile: make dashboard single column */
+@media (max-width: 880px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------- FIX: prevent horizontal overflow & tighten layout ---------- */
+
+/* Dashboard grid safe guards */
+.dashboard {
+  padding-left: 0;
+  padding-right: 0;
+}
+.dashboard-grid {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-x: hidden;  /* ✅ hides horizontal scroll */
+  overflow-y: visible; /* ✅ lets content grow vertically */
+  grid-auto-rows: min-content; /* defensive: let rows size to content */
+}
+
+/* Make sure cards don't cause overflow */
+.card {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: visible;    /* allow children to show (no clipping) */
+  min-height: 0;        /* flex/grid sizing fix */
+}
+
+/* ResponsiveContainer sometimes renders SVG width > parent when zoomed — ensure it clamps */
+.card svg, .card canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* Chart tooltip / zoom button container guard */
+.card > * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Keep body content from expanding unexpectedly on very small or very large zooms */
+@media (min-width: 1600px) {
+  .main-wrap { max-width: 1400px; }
+}
+
+/* Mobile polish already present, but ensure no horizontal scroll on small screens */
+@media (max-width: 880px){
+  html, body { overflow-x: hidden; }
+  .main-wrap { padding-left: 12px; padding-right: 12px; }
+}
+
+/* ---------- TOAST + BUTTON POLISH ---------- */
+
+/* toast container styles handled inline in component; just small helper for button hover */
+.card button, .card a {
+  transition: transform .08s ease, opacity .12s ease;
+}
+.card button:hover, .card a:hover {
+  transform: translateY(-2px);
+  opacity: 0.98;
+}
+
+/* slightly reduce hit area spacing on tiny screens for tx list buttons */
+@media (max-width:520px) {
+  .card button, .card a {
+    padding: 6px 6px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* ---------- RESPONSIVE LAYOUT POLISH ---------- */
+/* Mobile-first safe overrides to stack dashboard and optimize spacing */
+
+/* Make main container narrower and centered on small screens */
+@media (max-width: 1280px) {
+  .main-wrap {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+/* At tablet / mobile sizes stack the dashboard columns (more precise overrides) */
+@media (max-width: 880px) {
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* single column */
+    gap: 14px;
+    align-items: stretch;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Make cards full width and easier to read */
+  .dashboard .card {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  /* Increase chart height on small screens for readability */
+  .dashboard .card > div[style*="height"] {
+    height: 300px !important;
+  }
+
+  /* Make the assets legend flow better */
+  .dashboard .card .legend {
+    display: block;
+    margin-top: 10px;
+  }
+
+  /* Stack the small top row (Balance + assets) vertically */
+  .dashboard .card > .row,
+  .dashboard .balance-row {
+    display: block;
+  }
+
+  /* Transactions list: make actions inline and touch-friendly */
+  .card ul li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .card ul li > div:last-child {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* Larger hit targets for copy/explorer */
+  .card button, .card a {
+    padding: 8px 10px !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+  }
+
+  /* Reduce empty spacing between hero and chat on mobile */
+  .hero { margin-bottom: 10px; }
+  .chat-mock { padding: 18px; border-radius: 12px; }
+
+  /* Reduce overall page padding for narrow screens */
+  .main-wrap {
+    padding-top: 36px;
+    padding-bottom: 80px;
+  }
+
+  /* Make the toast stack smaller on mobile */
+  [aria-live="polite"] { left: 10px !important; bottom: 10px !important; }
+}
+
+/* Extra polish for very small screens (phones) */
+@media (max-width: 520px) {
+  .hero-title .display { font-size: 28px; }
+  .hero-sub { font-size: 0.95rem; }
+  .chat-mock { padding: 14px; }
+  .card { padding: 12px; border-radius: 10px; }
+  .dashboard .card > div[style*="height"] { height: 260px !important; }
+}
+
+/* Make sure charts and svgs never overflow on small screens */
+.card svg, .card canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* ---------- WALLET CONNECT + TX VISUAL POLISH ---------- */
+
+/* top fixed bar spacer: ensure page content doesn't hide behind it */
+body > div[style*="position: fixed"] + * {
+  /* a tiny top padding so header doesn't overlap hero text on small screens */
+  padding-top: 54px;
+}
+
+/* wallet button styles (matches theme) */
+.wallet-cta {
+  transition: transform .08s ease, box-shadow .12s ease;
+}
+.wallet-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,0.55); }
+
+/* small wallet pill */
+.wallet-pill { transition: transform .08s ease; }
+.wallet-pill:hover { transform: translateY(-2px); }
+
+/* transaction token dot sizing when shown */
+.card ul li span { width: 10px; height: 10px; }
+
+/* ensure header top space removal on very small screens */
+@media (max-width:520px) {
+  body > div[style*="position: fixed"] + * { padding-top: 44px; }
+}
+/* ---------- CLIPPING FIX (append this at end of app/globals.css) ---------- */
+
+/* Keep horizontal scroll hidden but allow vertical growth everywhere in dashboard area */
+.dashboard, .dashboard-grid, .dashboard-grid > *, .dashboard-grid > * > * {
+  overflow-x: hidden !important;  /* never allow horizontal escape */
+  overflow-y: visible !important; /* ensure vertical content is visible */
+}
+
+/* Ensure each card will expand vertically and has bottom padding to avoid cutoff */
+.card {
+  overflow: visible !important;
+  min-height: 0 !important;
+  padding-bottom: 18px !important; /* give breathing room at bottom */
+}
+
+/* Make grid rows size to content (very defensive) */
+.dashboard-grid {
+  grid-auto-rows: min-content !important;
+}
+
+/* Small extra guard for the specific recent-activity card if it still clips */
+.recent-activity-card, .card.recent-activity, .card[data-name="recent-activity"] {
+  overflow: visible !important;
+  padding-bottom: 18px !important;
+}
+
+/* DEBUG helpers (uncomment to visualize potential clippers - remove after use)
+.debug-clip * { outline: 1px dashed rgba(255,0,0,0.15) !important; }
+*/
+
+/* End of clipping fix */
+/* ---------- TOP NAV + HERO BACKDROP (append) ---------- */
+
+/* top fixed nav wrapper */
+.top-nav {
+  position: fixed;
+  top: 8px;
+  left: 0;
+  right: 0;
+  z-index: 80;
+  pointer-events: none;
+}
+
+/* inner nav content (centered) */
+.nav-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  pointer-events: auto;
+}
+
+/* left logo */
+.nav-logo {
+  font-weight: 800;
+  font-size: 18px;
+  text-decoration: none;
+  background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+/* center nav links */
+.nav-center { display:flex; gap:12px; align-items:center; }
+.nav-link {
+  color: var(--muted);
+  font-size: 14px;
+  text-decoration: none;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+.nav-link:hover { color: #e6eef6; transform: translateY(-2px); }
+
+/* right side container (notif + wallet) */
+.nav-right { display:flex; gap:8px; align-items:center; }
+
+/* small notification button */
+.notif-btn { background: transparent; border: 0; }
+
+/* hero backdrop: subtle grid + shimmer */
+.hero {
+  position: relative; /* ensure pseudo element sits behind content */
+  overflow: visible;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.008) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.008) 1px, transparent 1px);
+  background-size: 72px 72px;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  transform: translateZ(0);
+  filter: blur(0.2px);
+}
+
+/* shimmering radial glow (very subtle) */
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -20%;
+  width: 140%;
+  height: 120%;
+  transform: translateX(-50%) rotate(6deg);
+  background: radial-gradient(ellipse at 50% 10%, rgba(110,231,215,0.03), transparent 40%);
+  pointer-events: none;
+  opacity: 0.9;
+  animation: hero-shimmer 12s linear infinite;
+  mix-blend-mode: overlay;
+}
+
+@keyframes hero-shimmer {
+  0% { transform: translateX(-60%) rotate(0.5deg); opacity: 0.85; }
+  50% { transform: translateX(-40%) rotate(-0.5deg); opacity: 0.95; }
+  100% { transform: translateX(-60%) rotate(0.5deg); opacity: 0.85; }
+}
+
+/* small responsive adjustments for nav */
+@media (max-width: 880px) {
+  .nav-center { display: none; } /* hide docs/about on small screens */
+  .nav-inner { padding: 6px 12px; }
+  .top-nav { top: 6px; }
+}
+/* ---------- DASHBOARD POLISH: STATUS TAGS + CHARTS ---------- */
+
+/* Status tag small reset (we apply inline styles too) */
+.status-tag {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+/* Make the active dot pop on hover */
+.recharts-active-dot {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+
+/* Slightly increase chart area padding on mobile */
+@media (max-width: 520px) {
+  .dashboard .card > div[style*="height"] { height: 280px !important; }
+  .dashboard .card { padding: 12px; }
+}
+
+/* Transaction item hover */
+.card ul li:hover {
+  background: linear-gradient(90deg, rgba(110,231,215,0.02), rgba(192,132,252,0.02));
+  transform: translateY(-1px);
+  transition: transform 120ms ease, background 120ms ease;
+}
+/* ---------- Transactions list layout fixes (append) ---------- */
+
+/* Row */
+.tx-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255,255,255,0.02);
+  gap: 16px;
+  min-height: 56px;
+}
+
+/* Left column flexible */
+.tx-left {
+  flex: 1 1 0;
+  min-width: 0; /* critical to allow truncation */
+}
+.tx-top-left { display:flex; align-items:center; gap:10px; }
+.tx-token-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  display:inline-block;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  flex: 0 0 auto;
+}
+.tx-meta { min-width: 0; }
+.tx-type { font-weight: 700; }
+.tx-hash {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px; /* truncate long hashes safely */
+}
+
+/* date under the left column */
+.tx-date { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+/* Right column: fixed, prevents overflow into left */
+.tx-right {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 220px; /* space for amount + buttons */
+}
+
+/* Amount + USD grouped */
+.tx-values { text-align: right; display:flex; flex-direction:column; gap:2px; min-width:82px; }
+.tx-amount { font-weight: 700; }
+.tx-amount.positive { color: var(--accent-a); }
+.tx-amount.negative { color: #f87171; }
+.tx-usd { font-size: 12px; color: var(--muted); }
+
+/* Badge */
+.tx-status-badge {
+  font-size: 12px;
+  padding: 6px 6px;
+  border-radius: 6px;
+  color: #fff;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width: 26px;
+  height: 26px;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08);
+}
+
+/* Buttons */
+.tx-actions { display:flex; gap:8px; align-items:center; }
+.tx-btn {
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.03);
+  background: transparent;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 64px;
+  text-align: center;
+}
+.tx-btn:hover { transform: translateY(-2px); opacity: 0.98; }
+
+/* Small screen adjustments */
+@media (max-width: 520px) {
+  .tx-right { min-width: 180px; gap:6px; }
+  .tx-hash { max-width: 140px; }
+  .tx-btn { padding: 6px 6px; font-size: 12px; min-width: 56px; }
+}
+
+/* ---------- Transactions list: final clean rules ---------- */
+
+.tx-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+.tx-title { font-weight:700; }
+.tx-sub { font-size:12px; color:var(--muted); }
+
+.tx-list { list-style:none; padding:0; margin:0; }
+
+.tx-row {
+  display:flex;
+  align-items:flex-start; /* allow left column to be taller */
+  justify-content:space-between;
+  padding:12px 0;
+  border-top:1px solid rgba(255,255,255,0.03);
+  gap:16px;
+  min-height:64px;
+  box-sizing:border-box;
+}
+
+/* LEFT: flexible, two-line layout (type above, hash below) */
+.tx-left {
+  flex:1 1 0;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+.tx-left-top { display:flex; gap:10px; align-items:center; }
+.tx-token-dot {
+  width:12px; height:12px; border-radius:999px;
+  display:inline-block; flex:0 0 auto;
+  box-shadow:0 3px 8px rgba(0,0,0,0.25);
+}
+.tx-title-wrap { display:flex; flex-direction:column; min-width:0; }
+.tx-type { font-weight:700; margin-bottom:2px; }
+.tx-hash {
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:220px; /* truncation width - adjust if needed */
+}
+
+/* date line below left block */
+.tx-date { margin-top:8px; font-size:12px; color:var(--muted); }
+
+/* RIGHT: fixed group */
+.tx-right {
+  flex:0 0 auto;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  min-width:220px;
+}
+
+/* values */
+.tx-values { display:flex; flex-direction:column; align-items:flex-end; gap:4px; min-width:86px; }
+.tx-amount { font-weight:700; }
+.tx-amount.positive { color: var(--accent-a); }
+.tx-amount.negative { color: #f87171; }
+.tx-usd { font-size:12px; color:var(--muted); }
+
+/* actions */
+.tx-actions { display:flex; gap:8px; align-items:center; }
+.tx-btn {
+  padding:6px 10px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.04);
+  background:transparent;
+  color:var(--muted);
+  font-size:13px;
+  cursor:pointer;
+  min-width:64px;
+  text-align:center;
+  text-decoration:none;
+}
+.tx-btn:hover { transform:translateY(-2px); opacity:0.98; }
+
+/* responsive - reduce right width on small screens */
+@media (max-width:680px) {
+  .tx-right { min-width:170px; gap:8px; }
+  .tx-hash { max-width:120px; }
+  .tx-btn { padding:6px 8px; font-size:12px; min-width:56px; }
 }

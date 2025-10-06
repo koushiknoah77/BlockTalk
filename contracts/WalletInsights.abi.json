@@ -1,0 +1,41 @@
+[
+  {
+    "inputs": [
+      { "internalType": "string", "name": "query", "type": "string" },
+      { "internalType": "string", "name": "answer", "type": "string" }
+    ],
+    "name": "logInsight",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "user", "type": "address" }],
+    "name": "getInsights",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "query", "type": "string" },
+          { "internalType": "string", "name": "answer", "type": "string" },
+          { "internalType": "uint256", "name": "timestamp", "type": "uint256" }
+        ],
+        "internalType": "struct WalletInsights.Insight[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": false, "internalType": "string", "name": "query", "type": "string" },
+      { "indexed": false, "internalType": "string", "name": "answer", "type": "string" },
+      { "indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256" }
+    ],
+    "name": "InsightLogged",
+    "type": "event"
+  }
+]

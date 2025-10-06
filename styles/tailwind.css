@@ -1,0 +1,127 @@
+/* styles/tailwind.css - Tailwind directives + theme vars + tx helpers */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #06060a;
+  --accent: #6ee7d7;
+  --accent-2: #c084fc;
+  --muted: #9ca3af;
+  --tx-in: #2dd4bf;   /* mint/teal for incoming */
+  --tx-out: #fb7185;  /* rose/red for outgoing */
+  --tx-neutral: #94a3b8;
+}
+
+html, body, #__next { height: 100%; }
+body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+
+/* grid overlay helper (optional) */
+.hero-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+  transform: translateZ(0);
+}
+
+/* ---------------- Transaction / Recent Activity helpers ---------------- */
+
+.tx-token-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  display: inline-block;
+  margin-right: 8px;
+  box-shadow: 0 0 0 4px rgba(0,0,0,0.25) inset;
+}
+
+.tx-amount {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.tx-amount.positive { color: var(--tx-in); text-shadow: 0 1px 0 rgba(0,0,0,0.6); }
+.tx-amount.negative { color: var(--tx-out); text-shadow: 0 1px 0 rgba(0,0,0,0.6); }
+
+.tx-usd { color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
+.tx-date { color: var(--muted); font-size: 0.8rem; margin-top: 6px; }
+
+.tx-type { font-weight: 600; font-size: 0.9rem; }
+.tx-hash { color: var(--muted); font-size: 0.86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+
+.tx-actions { display:flex; gap:8px; align-items:center; }
+.tx-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.tx-btn:hover { border-color: rgba(255,255,255,0.08); color: white; }
+
+.recent-activity-card { padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.02); }
+.tx-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.tx-title { font-weight:700; font-size:1.05rem; }
+.tx-sub { color:var(--muted); font-size:0.86rem; }
+
+.tx-list { list-style:none; margin:0; padding:0; display:block; }
+.tx-row {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  align-items:flex-start;
+}
+.tx-left { display:flex; gap:10px; align-items:flex-start; min-width:0; }
+.tx-left-top { display:flex; align-items:center; gap:8px; }
+.tx-title-wrap { display:flex; flex-direction:column; min-width:0; }
+
+@media (max-width: 640px) {
+  .tx-hash { max-width: 120px; font-size: 0.78rem; }
+  .tx-amount { font-size: 0.9rem; }
+}
+
+/* Compact / explorer-link variants used by the recent TransactionsList */
+.tx-row.compact {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  min-height: 64px;
+}
+.tx-left { display:flex; align-items:center; min-width:0; }
+.tx-left-top { display:flex; align-items:flex-start; gap:10px; min-width:0; }
+.tx-title-wrap { display:flex; flex-direction:column; min-width:0; gap:3px; }
+.tx-hash { color:var(--muted); font-size:0.86rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:140px; }
+.tx-date { color:var(--muted); font-size:0.78rem; margin-top:4px; }
+.compact-right {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  min-width: 170px;
+  max-width: 220px;
+}
+.tx-amount-link {
+  text-decoration: none;
+  display:flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.tx-usd-inline { color: var(--muted); font-size:0.82rem; margin-top:4px; }
+@media (max-width: 640px) {
+  .tx-hash { max-width:100px; font-size:0.78rem; }
+  .compact-right { min-width: 140px; }
+}
