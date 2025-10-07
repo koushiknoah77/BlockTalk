@@ -1,10 +1,31 @@
-node_modules/
-.env*
-.next/
-out/
-dist/
-.cache/
-*.log
+# node
+/node_modules
+/.next
+/out
+/dist
+/.parcel-cache
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
 
-.vercel
+# local envs & secrets
+.env
 .env.local
+.env.*.local
+.next/.env.local
+
+# hardhat / build artifacts
+/artifacts
+/cache
+/cache-loader
+/artifacts-logs
+/deployments
+/deployments/*.json
+
+# OS
+.DS_Store
+
+# editor
+.vscode
+.idea
+*.sublime*

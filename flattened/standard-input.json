@@ -1,0 +1,30 @@
+{
+  "language": "Solidity",
+  "settings": {
+    "evmVersion": "paris",
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "": [
+          "ast"
+        ],
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata"
+        ]
+      }
+    },
+    "remappings": []
+  },
+  "sources": {
+    "project/contracts/WalletInsights.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.19;\n\ncontract WalletInsights {\n    event InsightLogged(address indexed user, string query, string answer, uint256 timestamp);\n\n    struct Insight {\n        address user;\n        string query;\n        string answer;\n        uint256 timestamp;\n    }\n\n    Insight[] public insights;\n\n    function logInsight(string calldata query, string calldata answer) external {\n        insights.push(Insight({\n            user: msg.sender,\n            query: query,\n            answer: answer,\n            timestamp: block.timestamp\n        }));\n\n        emit InsightLogged(msg.sender, query, answer, block.timestamp);\n    }\n\n    function getInsight(uint256 index) external view returns (Insight memory) {\n        require(index < insights.length, \"Invalid index\");\n        return insights[index];\n    }\n\n    function getAllInsights() external view returns (Insight[] memory) {\n        return insights;\n    }\n\n    function getInsightsCount() external view returns (uint256) {\n        return insights.length;\n    }\n}\n"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+
+> blocktalk-ui@0.1.0 hh
+> hardhat --config hardhat.config.cjs --show-stack-traces
+
+[dotenv@17.2.3] injecting env (4) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+Hardhat version 3.0.6
+
+Usage: hardhat [GLOBAL OPTIONS] <TASK> [SUBTASK] [TASK OPTIONS] [--] [TASK ARGUMENTS]
+
+AVAILABLE TASKS:
+
+  build                    Build project
+  clean                    Clear the cache and delete all artifacts
+  compile                  Build project (alias for build)
+  console                  Open a hardhat console
+  flatten                  Flatten and print contracts and their dependencies
+  node                     Start a JSON-RPC server on top of Hardhat Network
+  run                      Run a user-defined script after compiling the project
+  telemetry                Display and modify telemetry settings
+  test                     Run all tests
+
+AVAILABLE SUBTASKS:
+
+  test solidity            Run the Solidity tests
+
+GLOBAL OPTIONS:
+
+  --build-profile          The build profile to use
+  --config                 A Hardhat config file
+  --coverage               Enables code coverage
+  --help, -h               Show this message, or a task's help if its name is provided
+  --init                   Initializes a Hardhat project
+  --network                The network to connect to
+  --show-stack-traces      Show stack traces (always enabled on CI servers)
+  --version                Show the version of hardhat
+
+To get help for a specific task run: npx hardhat <TASK> [SUBTASK] --help

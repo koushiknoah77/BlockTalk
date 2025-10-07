@@ -1,135 +1,109 @@
 // lib/insightContract.ts
-'use client';
+// Unified Aurora WalletInsights integration layer for BlockTalk
+// Exports:
+//   - WALLET_INSIGHTS_ADDRESS (verified Aurora contract)
+//   - WALLET_INSIGHTS_ABI (minimal ABI)
+//   - publicClient (for reads)
+//   - writeLogInsight(query, answer): Promise<{ hash: string }>
 
-import {
-  createPublicClient,
-  http,
-  encodeFunctionData,
-  type Address,
-} from 'viem';
-import { auroraVirtual } from './chains/auroraVirtual';
-import { ensureAuroraNetwork } from './metaMask';
+import { createPublicClient, http } from "viem";
+import { ethers } from "ethers";
 
-// RPC endpoint fallback (can override via NEXT_PUBLIC_AURORA_RPC_URL)
+// ✅ your verified contract
+export const WALLET_INSIGHTS_ADDRESS =
+  "0xB09DE84A8ACe57c28425a2557Abcb2cdF4fAb572";
+
+// ✅ minimal ABI for read/write + event
+export const WALLET_INSIGHTS_ABI = [
+  {
+    inputs: [
+      { internalType: "string", name: "query", type: "string" },
+      { internalType: "string", name: "answer", type: "string" },
+    ],
+    name: "logInsight",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "index", type: "uint256" }],
+    name: "getInsight",
+    outputs: [
+      {
+        components: [
+          { internalType: "address", name: "user", type: "address" },
+          { internalType: "string", name: "query", type: "string" },
+          { internalType: "string", name: "answer", type: "string" },
+          { internalType: "uint256", name: "timestamp", type: "uint256" },
+        ],
+        internalType: "struct WalletInsights.Insight",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "user", type: "address" },
+      { indexed: false, internalType: "string", name: "query", type: "string" },
+      { indexed: false, internalType: "string", name: "answer", type: "string" },
+      { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" },
+    ],
+    name: "InsightLogged",
+    type: "event",
+  },
+];
+
+// ✅ use NEXT_PUBLIC_AURORA_RPC_URL if provided, otherwise fallback
 const AURORA_RPC =
-  (process.env.NEXT_PUBLIC_AURORA_RPC_URL as string) ??
-  (process.env.AURORA_RPC_URL as string) ??
-  'https://0x4e4542a7.rpc.aurora-cloud.dev';
+  typeof process !== "undefined" && process.env?.NEXT_PUBLIC_AURORA_RPC_URL
+    ? process.env.NEXT_PUBLIC_AURORA_RPC_URL
+    : "https://0x4e4542a7.rpc.aurora-cloud.dev";
 
+// ✅ publicClient for read-only queries
 export const publicClient = createPublicClient({
-  chain: auroraVirtual,
   transport: http(AURORA_RPC),
 });
 
-// Contract address (set via env or fallback)
-export const walletInsightsAddress: Address =
-  (process.env.NEXT_PUBLIC_WALLET_INSIGHTS_ADDR as Address) ??
-  '0xB174d92Ae6AB5623072bBc0A2aC3E54E94CA63C3';
-
-// Minimal ABI for WalletInsights.logInsight
-export const walletInsightsAbi = [
-  {
-    inputs: [
-      { internalType: 'string', name: 'query', type: 'string' },
-      { internalType: 'string', name: 'answer', type: 'string' },
-    ],
-    name: 'logInsight',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-] as const;
-
-const MAX_LEN = 1024; // max chars for query/answer to encode safely
-
-type WriteResult = { hash: string };
-
 /**
- * writeLogInsight:
- * - client-only
- * - ensures Aurora network (may prompt user)
- * - encodes calldata and attempts gas estimate (best-effort)
- * - sends eth_sendTransaction via window.ethereum
+ * writeLogInsight(query, answer)
+ * Uses the user's wallet (window.ethereum) to send a transaction
+ * calling the verified WalletInsights contract.
  */
-export async function writeLogInsight(query: string, answer: string): Promise<WriteResult> {
-  if (typeof window === 'undefined') throw new Error('writeLogInsight: client-only');
-
-  if (!query) throw new Error('writeLogInsight: missing query');
-  if (!answer) throw new Error('writeLogInsight: missing answer');
-
-  // Clip to MAX_LEN to avoid accidentally huge calldata.
-  if (query.length > MAX_LEN || answer.length > MAX_LEN) {
-    throw new Error(`Query or answer too long (max ${MAX_LEN} characters).`);
+export async function writeLogInsight(query: string, answer: string): Promise<{ hash: string }> {
+  if (typeof window === "undefined") {
+    throw new Error("writeLogInsight must be called from the browser.");
   }
 
-  const provider: any = (window as any).ethereum;
-  if (!provider) throw new Error('writeLogInsight: no wallet provider found (window.ethereum)');
+  if (!query || !answer) {
+    throw new Error("Both query and answer are required.");
+  }
 
-  // Ensure user is on Aurora chain (may prompt)
+  // get injected provider (MetaMask or compatible)
+  const anyWindow = window as any;
+  const ethProvider = anyWindow.ethereum;
+  if (!ethProvider) {
+    throw new Error("No wallet found — please install MetaMask or enable Aurora wallet injection.");
+  }
+
+  // connect to provider + signer
+  const provider = new ethers.BrowserProvider(ethProvider);
+  const signer = await provider.getSigner();
+  const contract = new ethers.Contract(WALLET_INSIGHTS_ADDRESS, WALLET_INSIGHTS_ABI, signer);
+
+  console.log("🟢 Logging insight on-chain:", { query, answer });
+
   try {
-    await ensureAuroraNetwork();
+    const tx = await contract.logInsight(query, answer);
+    console.log("⏳ Waiting for confirmation…", tx.hash);
+    await tx.wait();
+    console.log("✅ Insight logged successfully:", tx.hash);
+    return { hash: tx.hash };
   } catch (err: any) {
-    throw new Error(`Please switch to Aurora network in your wallet: ${String(err?.message ?? err)}`);
-  }
-
-  // Request accounts
-  let accounts: string[] = [];
-  try {
-    accounts = await provider.request({ method: 'eth_requestAccounts' });
-  } catch (err: any) {
-    throw new Error(`writeLogInsight: eth_requestAccounts failed: ${String(err?.message ?? err)}`);
-  }
-
-  const from = accounts && accounts.length > 0 ? accounts[0] : null;
-  if (!from) throw new Error('writeLogInsight: no wallet account available');
-
-  // Encode calldata for logInsight(query, answer)
-  let data: `0x${string}`;
-  try {
-    data = encodeFunctionData({
-      abi: walletInsightsAbi as any,
-      functionName: 'logInsight' as any,
-      args: [query, answer],
-    }) as `0x${string}`;
-  } catch (err: any) {
-    throw new Error(`writeLogInsight: encoding calldata failed: ${String(err?.message ?? err)}`);
-  }
-
-  // Try to estimate gas (best-effort)
-  let gasHex: string | undefined = undefined;
-  try {
-    const est: any = await publicClient.estimateGas({
-      account: from as `0x${string}`,
-      to: walletInsightsAddress,
-      data,
-    } as any);
-    if (est !== undefined && est !== null) {
-      const estBI = typeof est === 'bigint' ? est : BigInt(String(est));
-      const buffered = estBI + BigInt(10000); // small buffer
-      gasHex = '0x' + buffered.toString(16);
-      console.log('writeLogInsight: estimated gas (wei) ->', String(buffered), 'hex', gasHex);
-    }
-  } catch (err) {
-    console.warn('writeLogInsight: gas estimate failed (provider will estimate):', err);
-  }
-
-  const txPayload: any = {
-    from,
-    to: walletInsightsAddress,
-    data,
-  };
-  if (gasHex) txPayload.gas = gasHex;
-
-  // Send transaction via provider (MetaMask popup)
-  try {
-    const txHash = await provider.request({
-      method: 'eth_sendTransaction',
-      params: [txPayload],
-    });
-    return { hash: txHash };
-  } catch (err: any) {
-    const msg = String(err?.message ?? err);
-    console.error('writeLogInsight: eth_sendTransaction failed:', msg);
-    throw new Error(`Transaction failed or rejected: ${msg}`);
+    console.error("❌ Error during writeLogInsight:", err);
+    throw new Error(err?.message || "Transaction failed");
   }
 }
