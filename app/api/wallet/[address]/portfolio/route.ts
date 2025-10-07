@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { NextResponse } from "next/server";
 
 const COINGECKO_API = "https://api.coingecko.com/api/v3";
@@ -137,3 +138,4 @@ export async function GET(_req: Request, ctx: any) {
     return NextResponse.json({ error: String(err?.message ?? err) }, { status: 500 });
   }
 }
+
